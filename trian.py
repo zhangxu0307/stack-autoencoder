@@ -29,10 +29,10 @@ def loadMNIST(batchSize):
 def trainAE(encoderList, trainLayer, batchSize, epoch, useCuda = False):
 
     if useCuda:
-        for model in encoderList:
-            model = model.cuda()
+        for i in range(len(encoderList)):
+            encoderList[i].cuda()
 
-    optimizer = optim.Adam(encoderList[trainLayer].parameters(), lr=0.05)
+    optimizer = optim.SGD(encoderList[trainLayer].parameters(), lr=0.1)
     ceriation = nn.MSELoss()
     trainLoader, testLoader = loadMNIST(batchSize=batchSize)
 
@@ -51,8 +51,7 @@ def trainAE(encoderList, trainLayer, batchSize, epoch, useCuda = False):
             if useCuda:
                 x, target = x.cuda(), target.cuda()
             x, target = Variable(x), Variable(target)
-            x = x.view(-1, 1, 784)
-
+            x = x.view(-1, 784)
             # 产生需要训练层的输入数据
             out = x
             if trainLayer != 0:
@@ -80,7 +79,11 @@ def train(model, batchSize, epoch, useCuda = False):
     if useCuda:
         model = model.cuda()
 
-    optimizer = optim.Adam(model.parameters(), lr=0.05)
+    # 解锁参数
+    # for param in model.parameters():
+    #     param.requires_grad = True
+
+    optimizer = optim.SGD(model.parameters(), lr=0.1)
     ceriation = nn.CrossEntropyLoss()
     trainLoader, testLoader = loadMNIST(batchSize=batchSize)
 
@@ -110,13 +113,13 @@ def train(model, batchSize, epoch, useCuda = False):
         correct_cnt, sum_loss = 0, 0
         total_cnt = 0
         for batch_idx, (x, target) in enumerate(testLoader):
-            if useCuda:
-                x, targe = x.cuda(), target.cuda()
+
             x, target = Variable(x, volatile=True), Variable(target, volatile=True)
+            if useCuda:
+                x, target = x.cuda(), target.cuda()
             x = x.view(-1, 784)
 
             out = model(x)
-            x = x.view(-1, 784)
             loss = ceriation(out, target)
             _, pred_label = th.max(out.data, 1)
             total_cnt += x.data.size()[0]
@@ -130,6 +133,7 @@ def train(model, batchSize, epoch, useCuda = False):
 if __name__ == '__main__':
 
     batchSize = 128
+    AEepoch = 3
     epoch = 5
 
 
@@ -139,10 +143,11 @@ if __name__ == '__main__':
 
     encoderList = [encoder1, encoder2, encoder3]
 
-    trainAE(encoderList, 0, batchSize, epoch)
-    trainAE(encoderList, 1, batchSize, epoch)
-    trainAE(encoderList, 2, batchSize, epoch)
+    trainAE(encoderList, 0, batchSize, AEepoch, useCuda=True)
+    trainAE(encoderList, 1, batchSize, AEepoch, useCuda=True)
+    trainAE(encoderList, 2, batchSize, AEepoch, useCuda=True)
 
 
     model = SAE(encoderList)
-    train(model, batchSize, epoch)
+    #model = MLP()
+    train(model, batchSize, epoch, useCuda=True)

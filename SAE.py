@@ -8,11 +8,12 @@ class AutoEncoder(nn.Module):
         super().__init__()
         self.inputDim = inputDim
         self.hiddenDim = hiddenDim
-        self.encoder = nn.Linear(inputDim, hiddenDim)
-        self.decoder = nn.Linear(hiddenDim, inputDim)
-        self.act = F.relu
+        self.encoder = nn.Linear(inputDim, hiddenDim, bias=True)
+        self.decoder = nn.Linear(hiddenDim, inputDim, bias=True)
+        self.act = F.sigmoid
 
     def forward(self, x, rep=False):
+
         hidden = self.encoder(x)
         hidden = self.act(hidden)
         if rep == False:
@@ -23,6 +24,7 @@ class AutoEncoder(nn.Module):
             return hidden
 
 
+
 class SAE(nn.Module):
 
     def __init__(self, encoderList):
@@ -30,20 +32,53 @@ class SAE(nn.Module):
         super().__init__()
 
         self.encoderList = encoderList
+        self.en1 = encoderList[0]
+        self.en2 = encoderList[1]
+        self.en3 = encoderList[2]
 
-        self.fc = nn.Linear(98, 10)
-        self.act = F.relu
+        # for param in self.en1.parameters():
+        #      param.requires_grad = False
+        # for param in self.en2.parameters():
+        #      param.requires_grad = False
+        # for param in self.en3.parameters():
+        #      param.requires_grad = False
+
+        self.fc = nn.Linear(98, 10, bias=True)
 
     def forward(self, x):
 
         out = x
-        for encoder in self.encoderList:
-            out = encoder(out, rep=True)
+        # for i in range(len(self.encoderList)):
+        #     out = self.encoderList[i](out, rep=True)
+        out = self.en1(out, rep=True)
+        out = self.en2(out, rep=True)
+        out = self.en3(out, rep=True)
         out = self.fc(out)
-        out = self.act(out)
         out = F.softmax(out)
 
         return out
+
+class MLP(nn.Module):
+
+    def __init__(self):
+
+        super().__init__()
+
+        self.fc1 = nn.Linear(784, 392, bias=True)
+        self.fc2 = nn.Linear(392, 196, bias=True)
+        self.fc3 = nn.Linear(196, 10, bias=True)
+        self.act = F.sigmoid
+
+    def forward(self, x):
+
+        out = self.act(self.fc1(x))
+        out = self.act(self.fc2(out))
+        out = self.fc3(out)
+        out = F.softmax(out)
+
+        return out
+
+
 
 
 
