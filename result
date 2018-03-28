@@ -1,0 +1,20 @@
+ANN 3-layers relu 10epoch 0.961
+SAE 3-layers relu 10epoch without pre-trained AE 0.964
+SAE 3-layers relu 10epoch pre-trained AE 5epoch 0.682
+SAE 3-layers relu 10epoch pre-trained AE 15epoch 0.869
+SAE 3-layers relu 10epoch pre-trained AE 25epoch 0.774
+
+ANN 3-layers sigmoid 10epoch 0.667
+SAE 3-layers relu 10epoch without pre-trained AE 0.667
+SAE 3-layers relu 10epoch pre-trained AE 5epoch 0.659
+SAE 3-layers relu 10epoch pre-trained AE 10epoch  0.664
+SAE 3-layers relu 10epoch pre-trained AE 15epoch 0.739
+SAE 3-layers relu 10epoch pre-trained AE 25epoch 0.749
+
+SAE 3-layers relu 20epoch pre-trained AE 15epoch 0.768
+SAE 3-layers relu 15epoch pre-trained AE 15epoch
+ANN 3-layers sigmoid 20epoch  0.762
+
+
+ANN 4-layers sigmoid 15epoch 0.385
+SAE 4-layers relu 15epoch pre-trained AE 15epoch 0.562

@@ -66,14 +66,16 @@ class MLP(nn.Module):
 
         self.fc1 = nn.Linear(784, 392, bias=True)
         self.fc2 = nn.Linear(392, 196, bias=True)
-        self.fc3 = nn.Linear(196, 10, bias=True)
+        self.fc3 = nn.Linear(196, 98, bias=True)
+        self.classify = nn.Linear(98, 10, bias=True)
         self.act = F.sigmoid
 
     def forward(self, x):
 
         out = self.act(self.fc1(x))
         out = self.act(self.fc2(out))
-        out = self.fc3(out)
+        out = self.act(self.fc3(out))
+        out = self.classify(out)
         out = F.softmax(out)
 
         return out

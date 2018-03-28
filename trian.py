@@ -42,8 +42,7 @@ def trainAE(encoderList, trainLayer, batchSize, epoch, useCuda = False):
 
         if trainLayer != 0: # 单独处理第0层，因为第一个编码器之前没有前驱的编码器了
             for i in range(trainLayer): # 冻结要训练前面的所有参数
-                model = encoderList[i]
-                for param in model.parameters():
+                for param in encoderList[i].parameters():
                     param.requires_grad = False
 
         for batch_idx, (x, target) in enumerate(trainLoader):
@@ -70,9 +69,6 @@ def trainAE(encoderList, trainLayer, batchSize, epoch, useCuda = False):
                 print('==>>> train layer:{}, epoch: {}, batch index: {}, train loss: {:.6f}'
                       .format(trainLayer, i, batch_idx + 1, sum_loss/batch_idx))
 
-    #return encoderList
-
-
 
 def train(model, batchSize, epoch, useCuda = False):
 
@@ -80,8 +76,8 @@ def train(model, batchSize, epoch, useCuda = False):
         model = model.cuda()
 
     # 解锁参数
-    # for param in model.parameters():
-    #     param.requires_grad = True
+    for param in model.parameters():
+        param.requires_grad = True
 
     optimizer = optim.SGD(model.parameters(), lr=0.1)
     ceriation = nn.CrossEntropyLoss()
@@ -133,8 +129,8 @@ def train(model, batchSize, epoch, useCuda = False):
 if __name__ == '__main__':
 
     batchSize = 128
-    AEepoch = 3
-    epoch = 5
+    AEepoch = 15
+    epoch = 15
 
 
     encoder1 = AutoEncoder(784, 392)
