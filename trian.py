@@ -33,7 +33,7 @@ def trainAE(encoderList, trainLayer, batchSize, epoch, useCuda = False):
             encoderList[i].cuda()
 
     optimizer = optim.SGD(encoderList[trainLayer].parameters(), lr=0.1)
-    ceriation = nn.MSELoss()
+    ceriation = nn.L1Loss()
     trainLoader, testLoader = loadMNIST(batchSize=batchSize)
 
     for i in range(epoch):
@@ -70,7 +70,7 @@ def trainAE(encoderList, trainLayer, batchSize, epoch, useCuda = False):
                       .format(trainLayer, i, batch_idx + 1, sum_loss/batch_idx))
 
 
-def train(model, batchSize, epoch, useCuda = False):
+def trainClassifier(model, batchSize, epoch, useCuda = False):
 
     if useCuda:
         model = model.cuda()
@@ -80,7 +80,7 @@ def train(model, batchSize, epoch, useCuda = False):
         param.requires_grad = True
 
     optimizer = optim.SGD(model.parameters(), lr=0.1)
-    ceriation = nn.CrossEntropyLoss()
+    ceriation = nn.NLLLoss()
     trainLoader, testLoader = loadMNIST(batchSize=batchSize)
 
     for i in range(epoch):
@@ -129,21 +129,19 @@ def train(model, batchSize, epoch, useCuda = False):
 if __name__ == '__main__':
 
     batchSize = 128
-    AEepoch = 15
-    epoch = 15
+    AEepoch = 20
+    epoch = 10
 
+    encoder1 = AutoEncoder(784, 256)
+    encoder2 = AutoEncoder(256, 64)
+    #encoder3 = AutoEncoder(196, 98)
 
-    encoder1 = AutoEncoder(784, 392)
-    encoder2 = AutoEncoder(392, 196)
-    encoder3 = AutoEncoder(196, 98)
-
-    encoderList = [encoder1, encoder2, encoder3]
+    encoderList = [encoder1, encoder2,]
 
     trainAE(encoderList, 0, batchSize, AEepoch, useCuda=True)
     trainAE(encoderList, 1, batchSize, AEepoch, useCuda=True)
-    trainAE(encoderList, 2, batchSize, AEepoch, useCuda=True)
-
+    #trainAE(encoderList, 2, batchSize, AEepoch, useCuda=True)
 
     model = SAE(encoderList)
     #model = MLP()
-    train(model, batchSize, epoch, useCuda=True)
+    trainClassifier(model, batchSize, epoch, useCuda=True)

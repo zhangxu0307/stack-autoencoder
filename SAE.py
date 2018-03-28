@@ -18,7 +18,7 @@ class AutoEncoder(nn.Module):
         hidden = self.act(hidden)
         if rep == False:
             out = self.decoder(hidden)
-            out = self.act(out)
+            #out = self.act(out)
             return out
         else:
             return hidden
@@ -34,27 +34,18 @@ class SAE(nn.Module):
         self.encoderList = encoderList
         self.en1 = encoderList[0]
         self.en2 = encoderList[1]
-        self.en3 = encoderList[2]
+        #self.en3 = encoderList[2]
 
-        # for param in self.en1.parameters():
-        #      param.requires_grad = False
-        # for param in self.en2.parameters():
-        #      param.requires_grad = False
-        # for param in self.en3.parameters():
-        #      param.requires_grad = False
-
-        self.fc = nn.Linear(98, 10, bias=True)
+        self.fc = nn.Linear(64, 10, bias=True)
 
     def forward(self, x):
 
         out = x
-        # for i in range(len(self.encoderList)):
-        #     out = self.encoderList[i](out, rep=True)
         out = self.en1(out, rep=True)
         out = self.en2(out, rep=True)
-        out = self.en3(out, rep=True)
+        #out = self.en3(out, rep=True)
         out = self.fc(out)
-        out = F.softmax(out)
+        out = F.log_softmax(out)
 
         return out
 
@@ -74,9 +65,9 @@ class MLP(nn.Module):
 
         out = self.act(self.fc1(x))
         out = self.act(self.fc2(out))
-        out = self.act(self.fc3(out))
+        #out = self.act(self.fc3(out))
         out = self.classify(out)
-        out = F.softmax(out)
+        out = F.log_softmax(out)
 
         return out
 
